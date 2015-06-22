@@ -9,6 +9,9 @@ import javax.swing.JFrame;
 
 import java.awt.BorderLayout;
 import java.io.File;
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
@@ -27,10 +30,8 @@ import com.sun.jna.platform.win32.WinReg;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
-//TODO:
-//add load from text file
-//add create backup
 public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = -3236441883355684879L;
@@ -163,15 +164,15 @@ public class MainFrame extends JFrame {
 		listPanel.add( scrollPane, BorderLayout.CENTER );
 		
 		envListModel = new DefaultListModel<>( );
-		String pathEnvVar = Advapi32Util.registryGetStringValue(
+		String pathVar = Advapi32Util.registryGetStringValue(
 			WinReg.HKEY_LOCAL_MACHINE,
 			"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment",
 			"Path"
 		);
-        String[] envVars = pathEnvVar.split( ";" );
-        
-        for( int i = 0; i < envVars.length; ++i ) {
-        	envListModel.addElement( envVars[i] );
+		
+        String[] pathVars = pathVar.split( ";" );
+        for( int i = 0; i < pathVars.length; ++i ) {
+        	envListModel.addElement( pathVars[i] );
         }
 		
 		envList = new JList<String>( envListModel );
@@ -199,14 +200,61 @@ public class MainFrame extends JFrame {
 	
 	private void loadMenuItemClick( ActionEvent event ) {
 		JFileChooser fc = new JFileChooser( "C:\\" );
+		fc.addChoosableFileFilter( new FileNameExtensionFilter( "Text files", "txt", "text" ) );
+		
         int choice = fc.showOpenDialog( this );
-        
         if( choice == JFileChooser.APPROVE_OPTION ) {
-            //
+        	File file = fc.getSelectedFile( );
+        	
+        	String paths = "";
+        	try {
+        		paths = new String( Files.readAllBytes( Paths.get( file.getPath( ) ) ) );
+        	}
+        	catch( Exception e ) {
+        		JOptionPane.showMessageDialog( this, "Unable to open file:\n" + e.getMessage( ) );
+			}
+        	
+        	if( !paths.equals( "" ) ) {
+        		envListModel.clear( );
+        		
+        		String[] pathVars = paths.split( ";" );
+                for( int i = 0; i < pathVars.length; ++i ) {
+                	envListModel.addElement( pathVars[i] );
+                }
+        	}
+        	
+        	//updatePathVariable( );
         }
 	}
 	private void backupMenuItemClick( ActionEvent event ) {
+		JFileChooser fc = new JFileChooser( "C:\\" );
+		fc.setFileFilter( new FileNameExtensionFilter( "Text file (.txt)", "txt" ) );
 		
+        int choice = fc.showSaveDialog( this );
+        if( choice == JFileChooser.APPROVE_OPTION ) {
+        	String filename = "";
+        	try {
+        		filename = fc.getSelectedFile( ).getCanonicalPath( );
+        		if( !filename.endsWith( ".txt" ) ) {
+        			filename += "." + ( ( FileNameExtensionFilter )fc.getFileFilter( ) ).getExtensions( )[0];
+        		}
+        	}
+        	catch( Exception e ) {
+        		JOptionPane.showMessageDialog( this, "Error saving file:\n" + e.getMessage( ) );
+        	}
+        	
+        	try( FileWriter fw = new FileWriter( filename ) ) {
+                String newPaths = "";
+        		for( int i = 0; i < envListModel.size( ); ++i ) {
+        			newPaths += envListModel.get( i ) + ";";
+                }
+        		
+                fw.write( newPaths.toString( ) );
+            }
+        	catch( Exception e ) {
+        		JOptionPane.showMessageDialog( this, "Unable to create backup:\n" + e.getMessage( ) );
+            }
+        }
 	}
 	private void quitMenuItemClick( ActionEvent event ) {
         System.exit( 0 );
@@ -214,8 +262,8 @@ public class MainFrame extends JFrame {
 	private void addMenuItemClick( ActionEvent event ) {
         JFileChooser fc = new JFileChooser( "C:\\" );
         fc.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
-        int choice = fc.showOpenDialog( this );
         
+        int choice = fc.showOpenDialog( this );
         if( choice == JFileChooser.APPROVE_OPTION ) {
             File file = fc.getSelectedFile( );
             envListModel.addElement( file.getPath( ) );
@@ -281,10 +329,9 @@ public class MainFrame extends JFrame {
 	}
 	
 	private void updatePathVariable( ) {
-		String newPathVar = "";
-		
+		String newPaths = "";
 		for( int i = 0; i < envListModel.size( ); ++i ) {
-			newPathVar += envListModel.get( i ) + ";";
+			newPaths += envListModel.get( i ) + ";";
         }
 		
 		try {
@@ -292,12 +339,11 @@ public class MainFrame extends JFrame {
 				WinReg.HKEY_LOCAL_MACHINE,
 				"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment",
 				"Path",
-				newPathVar
+				newPaths
 			);
 		}
 		catch( Exception e ) {
-			JOptionPane.showMessageDialog( this, "Error\n" + e.getMessage( ) );
-			e.printStackTrace( );
+			JOptionPane.showMessageDialog( this, "Error:\n" + e.getMessage( ) );
 		}
 	}
 }
