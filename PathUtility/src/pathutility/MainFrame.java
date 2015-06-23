@@ -221,6 +221,7 @@ public class MainFrame extends JFrame {
     }
 	private void addMenuItemClick( ActionEvent event ) {
         JFileChooser fc = new JFileChooser( "C:\\" );
+        fc.setApproveButtonText( "Select" );
         fc.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
         
         int choice = fc.showOpenDialog( this );
