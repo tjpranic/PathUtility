@@ -10,10 +10,6 @@ NOT: This project was coded using Eclipse 4.4
 
 Build into an executable JAR and run.
 
-Future Considerations & Concerns
------------
-- Project is not yet complete
-
 License
 -----------
 
