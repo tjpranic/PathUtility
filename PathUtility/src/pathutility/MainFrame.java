@@ -10,8 +10,6 @@ import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FileWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
@@ -44,7 +42,6 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeMenuItem;
 	private JMenuItem modifyMenuItem;
 	private JMenuItem showMenuItem;
-	private JMenuItem loadMenuItem;
 	private JMenuItem backupMenuItem;
 	private JMenuItem quitMenuItem;
 	private JMenuItem aboutMenuItem;
@@ -111,14 +108,6 @@ public class MainFrame extends JFrame {
 		optionMenu = new JMenu( "Options" );
 		menuBar.add( optionMenu );
 		
-		loadMenuItem = new JMenuItem( "Load from file" );
-		loadMenuItem.addActionListener( new ActionListener( ) {
-			@Override
-			public void actionPerformed( ActionEvent event ) {
-				loadMenuItemClick( event );
-			}
-		} );
-		
 		backupMenuItem = new JMenuItem( "Create Backup" );
 		backupMenuItem.addActionListener( new ActionListener( ) {
 			@Override
@@ -135,7 +124,6 @@ public class MainFrame extends JFrame {
 			}
 		} );
 		
-		optionMenu.add( loadMenuItem );
 		optionMenu.add( backupMenuItem );
 		optionMenu.addSeparator( );
 		optionMenu.add( quitMenuItem );
@@ -198,34 +186,6 @@ public class MainFrame extends JFrame {
 		getContentPane( ).setLayout( listPanelGL );
 	}
 	
-	private void loadMenuItemClick( ActionEvent event ) {
-		JFileChooser fc = new JFileChooser( "C:\\" );
-		fc.addChoosableFileFilter( new FileNameExtensionFilter( "Text files", "txt", "text" ) );
-		
-        int choice = fc.showOpenDialog( this );
-        if( choice == JFileChooser.APPROVE_OPTION ) {
-        	File file = fc.getSelectedFile( );
-        	
-        	String paths = "";
-        	try {
-        		paths = new String( Files.readAllBytes( Paths.get( file.getPath( ) ) ) );
-        	}
-        	catch( Exception e ) {
-        		JOptionPane.showMessageDialog( this, "Unable to open file:\n" + e.getMessage( ) );
-			}
-        	
-        	if( !paths.equals( "" ) ) {
-        		envListModel.clear( );
-        		
-        		String[] pathVars = paths.split( ";" );
-                for( int i = 0; i < pathVars.length; ++i ) {
-                	envListModel.addElement( pathVars[i] );
-                }
-        	}
-        	
-        	//updatePathVariable( );
-        }
-	}
 	private void backupMenuItemClick( ActionEvent event ) {
 		JFileChooser fc = new JFileChooser( "C:\\" );
 		fc.setFileFilter( new FileNameExtensionFilter( "Text file (.txt)", "txt" ) );
