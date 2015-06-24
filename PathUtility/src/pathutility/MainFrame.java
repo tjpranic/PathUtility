@@ -4,6 +4,8 @@ import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JFrame;
 
@@ -16,11 +18,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JList;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.ListSelectionModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.SwingUtilities;
 
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
@@ -49,6 +53,11 @@ public class MainFrame extends JFrame {
 	private JPanel 			  	     listPanel;
 	private JList<String> 			 envList;
 	private DefaultListModel<String> envListModel;
+	
+	private JPopupMenu listPopupMenu;
+	private JMenuItem  modifyPopupMenuItem;
+	private JMenuItem  removePopupMenuItem;
+	private JMenuItem  showPopupMenuItem;
 	
 	public MainFrame( ) {
 		setTitle( "PathVar Tool" );
@@ -95,7 +104,7 @@ public class MainFrame extends JFrame {
 		showMenuItem.addActionListener( new ActionListener( ) {
 			@Override
 			public void actionPerformed( ActionEvent event ) {
-				openMenuItemClick( event );
+				showMenuItemClick( event );
 			}
 		} );
 		
@@ -151,6 +160,37 @@ public class MainFrame extends JFrame {
 		scrollPane.setVerticalScrollBarPolicy( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
 		listPanel.add( scrollPane, BorderLayout.CENTER );
 		
+		listPopupMenu = new JPopupMenu( );
+		
+		modifyPopupMenuItem = new JMenuItem( "Modify" );
+		modifyPopupMenuItem.addActionListener( new ActionListener( ) {
+			@Override
+			public void actionPerformed( ActionEvent event ) {
+				modifyMenuItemClick( event );
+			}
+		} );
+		
+		removePopupMenuItem = new JMenuItem( "Remove" );
+		removePopupMenuItem.addActionListener( new ActionListener( ) {
+			@Override
+			public void actionPerformed( ActionEvent event ) {
+				removeMenuItemClick( event );
+			}
+		} );
+		
+		showPopupMenuItem = new JMenuItem( "Show in explorer" );
+		showPopupMenuItem.addActionListener( new ActionListener( ) {
+			@Override
+			public void actionPerformed( ActionEvent event ) {
+				showMenuItemClick( event );
+			}
+		} );
+		
+		listPopupMenu.add( modifyPopupMenuItem );
+		listPopupMenu.add( removePopupMenuItem );
+		listPopupMenu.addSeparator( );
+		listPopupMenu.add( showPopupMenuItem );
+		
 		envListModel = new DefaultListModel<>( );
 		String pathVar = Advapi32Util.registryGetStringValue(
 			WinReg.HKEY_LOCAL_MACHINE,
@@ -166,6 +206,21 @@ public class MainFrame extends JFrame {
 		envList = new JList<String>( envListModel );
 		envList.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
 		scrollPane.setViewportView( envList );
+		
+		envList.addMouseListener( new MouseListener( ) {
+			@Override
+			public void mouseClicked( MouseEvent event ) {
+				if( SwingUtilities.isRightMouseButton( event ) ) {
+					envList.setSelectedIndex( envList.locationToIndex( event.getPoint( ) ) );
+					listPopupMenu.show( event.getComponent( ), event.getX( ), event.getY( ) );
+				}
+			}
+			
+			public void mouseEntered  ( MouseEvent event ) { }
+			public void mouseExited   ( MouseEvent event ) { }
+			public void mousePressed  ( MouseEvent event ) { }
+			public void mouseReleased ( MouseEvent event ) { }
+		} );
 	}
 	private void initializeLayout( ) {
 		GroupLayout listPanelGL = new GroupLayout( getContentPane( ) );
@@ -265,7 +320,7 @@ public class MainFrame extends JFrame {
             JOptionPane.showMessageDialog( this, "No path selected" );
         }
     }
-    private void openMenuItemClick( ActionEvent event ) {
+    private void showMenuItemClick( ActionEvent event ) {
         int index = envList.getSelectedIndex( );
         if( index != -1 ) {
             try {
