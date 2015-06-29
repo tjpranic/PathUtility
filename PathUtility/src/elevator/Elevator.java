@@ -7,7 +7,7 @@ import java.lang.management.ManagementFactory;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;	
+import java.util.List;
 
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.Kernel32;
