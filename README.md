@@ -6,7 +6,7 @@ A small java program to manage the Windows PATH environment variable.
 Usage
 -----------
 
-NOT: This project was coded using Eclipse 4.4
+NOTE: This project was coded using Eclipse 4.4
 
 Build into an executable JAR and run.
 
