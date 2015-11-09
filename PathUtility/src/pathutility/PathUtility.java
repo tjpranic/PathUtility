@@ -34,7 +34,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class MainFrame extends JFrame {
+public class PathUtility extends JFrame {
 
     private static final long serialVersionUID = -3236441883355684879L;
 
@@ -59,7 +59,7 @@ public class MainFrame extends JFrame {
     private JMenuItem  removePopupMenuItem;
     private JMenuItem  showPopupMenuItem;
     
-    public MainFrame( ) {
+    public PathUtility( ) {
         setTitle( "PathVar Tool" );
         setSize( 450, 300 );
         setLocationRelativeTo( null );
@@ -338,7 +338,7 @@ public class MainFrame extends JFrame {
         EventQueue.invokeLater( new Runnable( ) {
             @Override
             public void run( ) {
-                About a = new About( MainFrame.this );
+                About a = new About( PathUtility.this );
                 a.setVisible( true );
             }
         } );

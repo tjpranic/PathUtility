@@ -5,7 +5,7 @@ import java.awt.EventQueue;
 import elevator.Elevator;
 
 public class Main {
-
+    
     public static void main( String[] args ) {
         //NOTE: Elevator re-runs the program if super user is
         //not detected so checking for super user is necessary
@@ -20,8 +20,8 @@ public class Main {
         EventQueue.invokeLater( new Runnable( ) {
             @Override
             public void run( ) {
-                MainFrame mw = new MainFrame( );
-                mw.setVisible( true );
+                PathUtility pu = new PathUtility( );
+                pu.setVisible( true );
             }
         } );
     }
