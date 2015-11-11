@@ -13,6 +13,7 @@ import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FileWriter;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -22,8 +23,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.ListSelectionModel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.SwingUtilities;
 
 import com.sun.jna.platform.win32.Advapi32Util;
@@ -50,8 +49,8 @@ public class PathUtility extends JFrame {
     private JMenuItem quitMenuItem;
     private JMenuItem aboutMenuItem;
     
-    private JPanel                        listPanel;
-    private JList<String>              envList;
+    private JPanel                   listPanel;
+    private JList<String>            envList;
     private DefaultListModel<String> envListModel;
     
     private JPopupMenu listPopupMenu;
@@ -65,14 +64,8 @@ public class PathUtility extends JFrame {
         setLocationRelativeTo( null );
         setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         
-        initalizeMenu( );
-        initializeList( );
-        initializeLayout( );
-    }
-    
-    private void initalizeMenu( ) {
         menuBar = new JMenuBar( );
-                
+        
         pathMenu = new JMenu( "Path" );
         menuBar.add( pathMenu );
 
@@ -151,14 +144,16 @@ public class PathUtility extends JFrame {
         helpMenu.add( aboutMenuItem );
         
         setJMenuBar( menuBar );
-    }
-    private void initializeList( ) {
+        
         listPanel = new JPanel( );
         listPanel.setLayout( new BorderLayout( ) );
+        listPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5) );
 
         JScrollPane scrollPane = new JScrollPane( );
         scrollPane.setVerticalScrollBarPolicy( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
         listPanel.add( scrollPane, BorderLayout.CENTER );
+        
+        getContentPane( ).add( listPanel );
         
         listPopupMenu = new JPopupMenu( );
         
@@ -221,24 +216,6 @@ public class PathUtility extends JFrame {
             public void mousePressed  ( MouseEvent event ) { }
             public void mouseReleased ( MouseEvent event ) { }
         } );
-    }
-    private void initializeLayout( ) {
-        GroupLayout listPanelGL = new GroupLayout( getContentPane( ) );
-        listPanelGL.setHorizontalGroup(
-            listPanelGL.createParallelGroup( Alignment.LEADING )
-                .addGroup( Alignment.TRAILING, listPanelGL.createSequentialGroup( )
-                    .addContainerGap( )
-                    .addComponent( listPanel, GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE )
-                    .addGap( 10 ) )
-        );
-        listPanelGL.setVerticalGroup(
-            listPanelGL.createParallelGroup( Alignment.TRAILING )
-                .addGroup( Alignment.LEADING, listPanelGL.createSequentialGroup( )
-                    .addGap( 10 )
-                    .addComponent( listPanel, GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE )
-                    .addGap( 10 ) )
-        );
-        getContentPane( ).setLayout( listPanelGL );
     }
     
     private void backupMenuItemClick( ActionEvent event ) {
